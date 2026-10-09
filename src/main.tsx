@@ -1,10 +1,15 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+//**Propósito. Iniciar React, cargar App e importar los estilos globales. */
 
-createRoot(document.getElementById('root')!).render(
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./styles/index.css";
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("No se encontró el elemento #root.");
+}
+createRoot(rootElement).render(
   <StrictMode>
     <App />
   </StrictMode>,
-)
+);
