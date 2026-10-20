@@ -11,6 +11,8 @@ temporalmente id de uno de los objetos, observa el error de TypeScript y despué
  * 
  */
 
+//datos demostrativos de tareas para la aplicación, informacion estatica.
+
 import type { Task } from "../models/task.interface";
 export const tasks: Task[] = [
   {
@@ -47,5 +49,33 @@ export const tasks: Task[] = [
     status: "pending",
     createdAt: "2026-09-26T16:00:00.000Z",
     updatedAt: "2026-09-26T16:00:00.000Z",
+  },
+  {
+    id: "task-006",
+    title: "Nuevas tareas para el proyecto",
+    status: "completed",
+    createdAt: "2026-10-13T16:00:00.000Z",
+    updatedAt: "2026-10-13T16:00:00.000Z",
+  },
+  {
+    id: "task-007",
+    title: "Nuevas tareas para el proyecto",
+    status: "completed",
+    createdAt: "2026-10-13T16:00:00.000Z",
+    updatedAt: "2026-10-13T16:00:00.000Z",
+  },
+  {
+    id: "task-008",
+    title: "Nuevas tareas para el proyecto",
+    status: "pending",
+    createdAt: "2026-10-13T16:00:00.000Z",
+    updatedAt: "2026-10-13T16:00:00.000Z",
+  },
+  {
+    id: "task-009",
+    title: "Nuevas tareas para el proyecto otra vez",
+    status: "pending",
+    createdAt: "2026-10-13T16:00:00.000Z",
+    updatedAt: "2026-10-13T16:00:00.000Z",
   },
 ];

@@ -7,14 +7,28 @@ objeto mediante la propiedad task.
 No utilices key={index} ni key={Math.random()}. task.id es una clave estable y forma parte del modelo.
 
 Recorrer la colección y generar un TaskItem por cada objeto.
+
+Transmitir las funciones de App a cada TaskItem.
+
+TaskList no modifica el arreglo. Su responsabilidad es renderizar la colección y reenviar las acciones
+correspondientes a cada elemento.
+
  */
 
 import type { Task } from "../models/task.interface";
 import { TaskItem } from "./TaskItem";
 interface TaskListProps {
   tasks: Task[];
+  onToggleStatus: (id: string) => void;
+  onEditTask: (id: string, title: string) => void;
+  onDeleteTask: (id: string) => void;
 }
-export function TaskList({ tasks }: TaskListProps) {
+export function TaskList({
+  tasks,
+  onToggleStatus,
+  onEditTask,
+  onDeleteTask,
+}: TaskListProps) {
   const resultLabel = tasks.length === 1 ? "1 tarea" : `${tasks.length} tareas`;
   return (
     <section className="panel" aria-labelledby="task-list-title">
@@ -28,15 +42,18 @@ export function TaskList({ tasks }: TaskListProps) {
       {tasks.length === 0 ? (
         <div className="empty-state" role="status">
           <h3>No hay tareas registradas</h3>
-          <p>
-            La colección está vacía. Las nuevas tareas aparecerán en esta
-            sección.
-          </p>
+          <p>Utiliza el formulario para registrar una nueva actividad.</p>
         </div>
       ) : (
         <div className="task-list" role="list">
           {tasks.map((task) => (
-            <TaskItem key={task.id} task={task} />
+            <TaskItem
+              key={task.id}
+              task={task}
+              onToggleStatus={onToggleStatus}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
+            />
           ))}
         </div>
       )}
