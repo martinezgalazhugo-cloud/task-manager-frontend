@@ -31,38 +31,54 @@ If you are developing a production application, we recommend enabling type-aware
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
 
-1. ¿Qué función cumple la interfaz Task?
-   Define la estructura que debe tener un objeto de tarea: id, title, status, createdAt y updatedAt. TypeScript la usa para comprobar que las tareas tengan esos campos y tipos. Está en task.interface.ts.
+1. ¿Qué diferencia existe entre una variable local y el estado de React?
 
-2. ¿Qué diferencia existe entre Task y TaskStatus?
-   Task describe una tarea completa. TaskStatus limita el valor de status a dos opciones: "pending" o "completed".
+Variable local vs. estado de React: una variable local común se crea de nuevo cada vez que se ejecuta el componente y no conserva por sí misma un valor entre renderizados. El estado de React sí persiste entre renderizados; al actualizarlo, React vuelve a renderizar el componente. Por ejemplo, TaskForm.tsx conserva el título escrito mediante estado.
 
-3. ¿Qué significa declarar un arreglo como Task[]?
-   Significa que es un arreglo cuyos elementos deben cumplir la estructura de Task. Por ejemplo, tasks: Task[] es una colección de tareas.
+2. ¿Qué valores devuelve useState?
 
-4. ¿Qué hace el método map?
-   Recorre un arreglo y, por cada elemento, ejecuta una función que produce un nuevo valor. Devuelve un nuevo arreglo y no modifica el original.
+Valores que devuelve useState: devuelve un par: el valor actual del estado y una función para actualizarlo. En const [title, setTitle] = useState(""), title es el valor y setTitle lo actualiza.
 
-5. ¿Qué resultado produce map dentro de TaskList?
-   Convierte cada tarea de tasks en un componente TaskItem. El resultado es una lista de elementos visuales para renderizar; si no hay tareas, se muestra el estado vacío en vez de la lista. Ver TaskList.tsx.
+3. ¿Por qué useState se declara en el nivel superior del componente?
 
-6. ¿Para qué utiliza React la propiedad key?
-   Para identificar cada elemento de una lista entre renderizados. Así React puede reconocer cuáles elementos cambiaron, se agregaron o se quitaron.
+Por qué se declara arriba del componente: los Hooks deben llamarse en el nivel superior, no dentro de condiciones, ciclos ni funciones anidadas. Así React puede asociar cada Hook con su estado en el mismo orden en cada renderizado.
 
-7. ¿Por qué se utiliza task.id y no el índice?
-   Porque el identificador de la tarea es estable y único. El índice puede cambiar al insertar, quitar o reordenar tareas, lo que podría hacer que React asocie incorrectamente los elementos.
+4. ¿Qué significa que un campo sea controlado?
 
-8. ¿Cómo se envía una tarea de TaskList a TaskItem?
-   TaskList le pasa el objeto mediante la propiedad task: <TaskItem key={task.id} task={task} />. TaskItem lo recibe y lo usa para mostrar sus datos.
+Campo controlado: es un campo cuyo valor está ligado al estado de React. En TaskForm, value={title} muestra el estado y onChange lo actualiza con setTitle; así el estado y el campo permanecen sincronizados.
 
-9. ¿Cómo se comunican App, TaskSummary y TaskList?
-   App importa la colección tasks y la envía a ambos componentes mediante props: tasks={tasks}. TaskSummary calcula los conteos y TaskList presenta las tareas. En este flujo, la comunicación es de padre a hijo mediante props.
+5. ¿Por qué handleSubmit utiliza preventDefault?
 
-10. ¿Qué es el renderizado condicional?
-    Es mostrar distintos elementos según una condición. En TaskList, si tasks.length === 0, se muestra el mensaje de lista vacía; si hay tareas, se muestra la lista. También TaskItem usa una condición para elegir la etiqueta del estado.
+Por qué handleSubmit usa preventDefault: evita el envío HTML tradicional del formulario, que recargaría la página. La aplicación puede manejar el envío y crear la tarea sin perder el estado actual.
 
-11. ¿Por qué el resumen se calcula a partir de la colección?
-    Para que el total, las pendientes y las completadas reflejen los datos reales de tasks, en lugar de depender de números escritos por separado que podrían quedar desactualizados. TaskSummary cuenta las completadas con filter y obtiene las pendientes restándolas del total.
+6. ¿Cómo comunica TaskForm una nueva tarea a App?
 
-12. ¿Qué dificultad encontraste durante la refactorización y cómo la resolviste?
-    No encontre nada dificil en particular.
+Cómo TaskForm comunica una tarea a App: recibe onAddTask como prop y, al enviar el formulario, llama onAddTask(normalizedTitle). La función fue definida en App.tsx, donde se crea y agrega la tarea.
+
+7. ¿Por qué App funciona como fuente de verdad?
+
+Por qué App es la fuente de verdad: mantiene la colección compartida tasks y se la pasa a los componentes que la necesitan. Así, el formulario, el resumen y la lista trabajan sobre los mismos datos, en lugar de mantener copias divergentes.
+
+8. ¿Cómo se implementa Create sin utilizar push?
+
+Cómo se implementa Create sin push: handleAddTask crea una nueva tarea y actualiza el estado con [newTask, ...currentTasks]. Esto produce un arreglo nuevo sin mutar el anterior; React puede detectar el cambio y renderizarlo.
+
+9. ¿Cómo permite map actualizar una sola tarea?
+
+Cómo map actualiza una sola tarea: recorre el arreglo y compara el id de cada tarea con el de la seleccionada. Si coincide, devuelve un objeto nuevo con los cambios; las demás tareas se devuelven sin modificar. TaskList también usa map para mostrar cada tarea como un TaskItem.
+
+10. ¿Cómo utiliza filter la operación Delete?
+
+Cómo filter realiza Delete: conserva las tareas cuyo id es distinto del que se quiere borrar. El resultado es un arreglo nuevo sin la tarea seleccionada.
+
+11. ¿Por qué se emplea una función actualizadora en setTasks?
+
+Por qué usar una función actualizadora en setTasks: formas como setTasks((currentTasks) => ...) calculan el nuevo estado a partir del estado más reciente. Eso evita depender de una copia potencialmente desactualizada, algo importante cuando React agrupa actualizaciones.
+
+12. ¿Qué información conserva TaskItem como estado local?
+
+Qué estado local conserva TaskItem: conserva solo información temporal de la interfaz de edición: isEditing (si está editando) y draftTitle (el título en borrador). La colección principal sigue en App; el componente comunica los cambios mediante sus funciones recibidas como props. Ver TaskItem.tsx.
+
+13. ¿Por qué los cambios desaparecen al recargar la página?
+
+Por qué los cambios desaparecen al recargar: las tareas se guardan en el estado en memoria de React. Al recargar, ese estado se inicializa otra vez desde los datos importados en tasks.ts; no se están guardando en almacenamiento persistente ni en un servidor.
