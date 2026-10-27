@@ -13,18 +13,22 @@ Transmitir las funciones de App a cada TaskItem.
 TaskList no modifica el arreglo. Su responsabilidad es renderizar la colección y reenviar las acciones
 correspondientes a cada elemento.
 
+Distinguir una colección sin tareas de una consulta sin coincidencias.
+
  */
 
 import type { Task } from "../models/task.interface";
 import { TaskItem } from "./TaskItem";
 interface TaskListProps {
   tasks: Task[];
+  emptyMessage: string;
   onToggleStatus: (id: string) => void;
   onEditTask: (id: string, title: string) => void;
   onDeleteTask: (id: string) => void;
 }
 export function TaskList({
   tasks,
+  emptyMessage,
   onToggleStatus,
   onEditTask,
   onDeleteTask,
@@ -41,8 +45,8 @@ export function TaskList({
       </div>
       {tasks.length === 0 ? (
         <div className="empty-state" role="status">
-          <h3>No hay tareas registradas</h3>
-          <p>Utiliza el formulario para registrar una nueva actividad.</p>
+          <h3>Sin resultados</h3>
+          <p>{emptyMessage}</p>
         </div>
       ) : (
         <div className="task-list" role="list">

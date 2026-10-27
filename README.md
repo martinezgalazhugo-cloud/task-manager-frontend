@@ -31,54 +31,63 @@ If you are developing a production application, we recommend enabling type-aware
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
 
-1. ¿Qué diferencia existe entre una variable local y el estado de React?
+1. ¿Por qué las reglas de validación se colocaron en una utilidad?
 
-Variable local vs. estado de React: una variable local común se crea de nuevo cada vez que se ejecuta el componente y no conserva por sí misma un valor entre renderizados. El estado de React sí persiste entre renderizados; al actualizarlo, React vuelve a renderizar el componente. Por ejemplo, TaskForm.tsx conserva el título escrito mediante estado.
+Para reunir en un solo lugar las reglas del título —recortar espacios y comprobar que tenga entre 3 y 120 caracteres— y reutilizarlas al crear y editar tareas. Así ambas operaciones validan de la misma manera. task-validation.ts
 
-2. ¿Qué valores devuelve useState?
+2. ¿Qué significa el retorno string | null de validateTaskTitle?
 
-Valores que devuelve useState: devuelve un par: el valor actual del estado y una función para actualizarlo. En const [title, setTitle] = useState(""), title es el valor y setTitle lo actualiza.
+La función devuelve un string con el mensaje si el título no es válido y null si pasa la validación. Quien la llama puede mostrar el mensaje o continuar con la operación, según el resultado.
 
-3. ¿Por qué useState se declara en el nivel superior del componente?
+3. ¿Qué función cumplen aria-invalid, aria-describedby y role alert?
 
-Por qué se declara arriba del componente: los Hooks deben llamarse en el nivel superior, no dentro de condiciones, ciclos ni funciones anidadas. Así React puede asociar cada Hook con su estado en el mismo orden en cada renderizado.
+aria-invalid indica a las tecnologías de asistencia si el campo tiene un error; aria-describedby vincula el campo con su texto de ayuda y, cuando existe, el error; y role="alert" hace que el mensaje se anuncie al aparecer. Mejoran la accesibilidad de la validación. TaskForm.tsx
 
-4. ¿Qué significa que un campo sea controlado?
+4. ¿Por qué query, filter y sortBy son estados controlados?
 
-Campo controlado: es un campo cuyo valor está ligado al estado de React. En TaskForm, value={title} muestra el estado y onChange lo actualiza con setTitle; así el estado y el campo permanecen sincronizados.
+Porque App conserva sus valores y los pasa a TaskFilters junto con las funciones para actualizarlos. De ese modo, los controles muestran el estado actual y la búsqueda, el filtro y el ordenamiento se calculan a partir de una fuente de verdad común. App.tsx · TaskFilters.tsx
 
-5. ¿Por qué handleSubmit utiliza preventDefault?
+5. ¿Por qué visibleTasks no debe almacenarse como estado independiente?
 
-Por qué handleSubmit usa preventDefault: evita el envío HTML tradicional del formulario, que recargaría la página. La aplicación puede manejar el envío y crear la tarea sin perder el estado actual.
+Es un resultado derivado de tasks, query, filter y sortBy. Calcularlo durante el render mantiene el resultado sincronizado y evita duplicar estado que podría quedar desactualizado. task-query.service.ts
 
-6. ¿Cómo comunica TaskForm una nueva tarea a App?
+6. ¿Cómo se normaliza una búsqueda?
 
-Cómo TaskForm comunica una tarea a App: recibe onAddTask como prop y, al enviar el formulario, llama onAddTask(normalizedTitle). La función fue definida en App.tsx, donde se crea y agrega la tarea.
+Se quitan los espacios al principio y al final y se convierte la consulta a minúsculas con la configuración regional es-MX. Los títulos también se pasan a minúsculas antes de buscar la coincidencia. No se eliminan tildes, por lo que cancion y canción no necesariamente coinciden.
 
-7. ¿Por qué App funciona como fuente de verdad?
+7. ¿Por qué se crea una copia antes de utilizar sort?
 
-Por qué App es la fuente de verdad: mantiene la colección compartida tasks y se la pasa a los componentes que la necesitan. Así, el formulario, el resumen y la lista trabajan sobre los mismos datos, en lugar de mantener copias divergentes.
+Porque sort modifica el arreglo sobre el que se ejecuta. La copia evita que el ordenamiento altere el arreglo filtrado —y, por tanto, la colección de origen— de forma accidental.
 
-8. ¿Cómo se implementa Create sin utilizar push?
+8. ¿Qué responsabilidad tiene task-query.service.ts?
 
-Cómo se implementa Create sin push: handleAddTask crea una nueva tarea y actualiza el estado con [newTask, ...currentTasks]. Esto produce un arreglo nuevo sin mutar el anterior; React puede detectar el cambio y renderizarlo.
+Buscar tareas por título, aplicar el filtro de estado y ordenarlas según la opción seleccionada. Recibe los datos y los criterios, y devuelve los resultados sin encargarse de la interfaz ni modificar el estado de App.
 
-9. ¿Cómo permite map actualizar una sola tarea?
+9. ¿Por qué el resultado de JSON.parse se trata como unknown?
 
-Cómo map actualiza una sola tarea: recorre el arreglo y compara el id de cada tarea con el de la seleccionada. Si coincide, devuelve un objeto nuevo con los cambios; las demás tareas se devuelven sin modificar. TaskList también usa map para mostrar cada tarea como un TaskItem.
+Porque los datos de localStorage pueden estar malformados o no tener la estructura esperada. unknown obliga a validarlos antes de usarlos como tareas, en vez de asumir que el contenido es seguro solo porque se pudo parsear. task-storage.services.ts
 
-10. ¿Cómo utiliza filter la operación Delete?
+10. ¿Qué comprueba la función isTask?
 
-Cómo filter realiza Delete: conserva las tareas cuyo id es distinto del que se quiere borrar. El resultado es un arreglo nuevo sin la tarea seleccionada.
+Que el valor sea un objeto con id y title de tipo texto; un estado permitido (pending o completed); y fechas createdAt y updatedAt que sean textos parseables como fechas. Si alguna tarea no cumple, el arreglo guardado no se acepta como válido.
 
-11. ¿Por qué se emplea una función actualizadora en setTasks?
+11. ¿Qué ventaja ofrece la inicialización diferida de useState?
 
-Por qué usar una función actualizadora en setTasks: formas como setTasks((currentTasks) => ...) calculan el nuevo estado a partir del estado más reciente. Eso evita depender de una copia potencialmente desactualizada, algo importante cuando React agrupa actualizaciones.
+useState(() => loadTasks(initialTasks)) carga las tareas al inicializar el estado, en lugar de volver a ejecutar esa lectura en cada render. Esto evita trabajo innecesario.
 
-12. ¿Qué información conserva TaskItem como estado local?
+12. ¿Por qué localStorage se sincroniza mediante useEffect?
 
-Qué estado local conserva TaskItem: conserva solo información temporal de la interfaz de edición: isEditing (si está editando) y draftTitle (el título en borrador). La colección principal sigue en App; el componente comunica los cambios mediante sus funciones recibidas como props. Ver TaskItem.tsx.
+El efecto guarda las tareas cuando cambia tasks, separando la persistencia del cálculo del render. Así, las operaciones de la interfaz actualizan el estado y el efecto refleja ese cambio en el almacenamiento. No se persisten allí los criterios de búsqueda. App.tsx
 
-13. ¿Por qué los cambios desaparecen al recargar la página?
+13. ¿Por qué TaskSummary recibe tasks y TaskList recibe visibleTasks?
 
-Por qué los cambios desaparecen al recargar: las tareas se guardan en el estado en memoria de React. Al recargar, ese estado se inicializa otra vez desde los datos importados en tasks.ts; no se están guardando en almacenamiento persistente ni en un servidor.
+El resumen debe contar todas las tareas, incluidas las que no aparecen por la búsqueda o el filtro. La lista, en cambio, debe mostrar solo las que coinciden con los criterios actuales. TaskSummary.tsx · TaskList.tsx
+
+14. ¿Qué información se pierde y cuál permanece al recargar?
+
+Permanece la colección de tareas guardada en localStorage: sus identificadores, títulos, estados y fechas. Se pierden los estados temporales de la interfaz, como la búsqueda, los filtros, el orden seleccionado y los borradores o errores de los formularios; al iniciar, esos criterios vuelven a sus valores por defecto. Si no hay datos guardados o no pasan la validación, se cargan las tareas iniciales.
+
+15. ¿Qué dificultad encontraste y cómo la resolviste?
+    Al importar ciertas clases y funciones, daba error por no encontrar dicha clase o funcion, al final el problema real parecio ser un problema con la sintaxis, que finalmente solucione ajustandolo correctamente.
+
+import de: "task.js" no "task.ts"
