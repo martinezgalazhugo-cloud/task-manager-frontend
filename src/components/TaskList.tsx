@@ -14,9 +14,9 @@ TaskList no modifica el arreglo. Su responsabilidad es renderizar la colección 
 correspondientes a cada elemento.
 
 Distinguir una colección sin tareas de una consulta sin coincidencias.
-
+Actualizar TaskList
+Alinear el tipo de eliminación con la respuesta booleana utilizada por el detalle.
  */
-
 import type { Task } from "../models/task.interface";
 import { TaskItem } from "./TaskItem";
 interface TaskListProps {
@@ -24,7 +24,7 @@ interface TaskListProps {
   emptyMessage: string;
   onToggleStatus: (id: string) => void;
   onEditTask: (id: string, title: string) => void;
-  onDeleteTask: (id: string) => void;
+  onDeleteTask: (id: string) => boolean;
 }
 export function TaskList({
   tasks,
