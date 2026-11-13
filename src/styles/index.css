@@ -467,6 +467,41 @@ Actividad 9. Ajustes de diseño para pantallas pequeñas.
   margin-top: 1rem;
 }
 
+/**
+Actividad 10. Ajustes de diseño para pantallas pequeñas.
+*/
+.request-status,
+.operation-message {
+  margin: 1rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+.request-status--error,
+.operation-message--error {
+  border-color: #b91c1c;
+}
+.request-status h3 {
+  margin-top: 0;
+}
+.task-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+[aria-busy="true"] {
+  opacity: 0.7;
+}
+
 @media (max-width: 720px) {
   .app-header {
     padding-block: 2.25rem;
@@ -504,5 +539,10 @@ Actividad 9. Ajustes de diseño para pantallas pequeñas.
   .task-detail__actions .button-link,
   .task-detail__actions button {
     width: 100%;
+  }
+  .task-summary,
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
