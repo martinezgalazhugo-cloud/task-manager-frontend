@@ -30,7 +30,8 @@ export function TaskDetailPage({ tasks, onDeleteTask }: TaskDetailPageProps) {
   }
   const statusLabel = task.status === "completed" ? "Completada" : "Pendiente";
   function handleDeleteTask(): void {
-    const wasDeleted = onDeleteTask(task.id);
+    // task.id fue cambiado por taskID as string para evitar error de tipo en TypeScript, ya que taskId puede ser undefined según la definición de useParams.
+    const wasDeleted = onDeleteTask(taskId as string);
     if (wasDeleted) {
       navigate("/tasks", {
         replace: true,
